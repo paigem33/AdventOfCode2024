@@ -2,47 +2,50 @@
 
 include('input.php');
 
-// $input = 
-// "7 6 4 2 1
-// 1 2 7 8 9
-// 9 7 6 2 1
-// 1 3 2 4 5
-// 8 6 4 4 1
-// 1 3 6 7 9";
-
-// $input = str_replace("\r", "", $input);
-// $input_array = explode("\n", trim($input));
-
 // The levels are either all increasing or all decreasing.
 // Any two adjacent levels differ by at least one and at most three
 
 $safe = 0;
-foreach($input_array as $row){
+foreach($input_array as $key => $row){
+    $row_safe = false;
     $array_row = explode(" ", $row);
-    if(isIncreasingOrDecreasing($array_row)){ // this is skipping ones that would work if one was removed, need to refactor into one method
-        for($i = 0; $i < count($array_row) - 1; $i++){
-            if(!isIncreasingOrDecreasingWithinRange($array_row[$i], $array_row[$i + 1]) || $array_row[$i] == $array_row[$i + 1]){
-                array_splice($array_row, $i, 1);
-                print_r($array_row);
-                if($i - 1 >= 0){
-                    if(!isIncreasingOrDecreasingWithinRange($array_row[$i - 1], $array_row[$i]) || $array_row[$i] == $array_row[$i - 1]){
-                        continue 2;
-                    }
-                } else {
-                    if(!isIncreasingOrDecreasingWithinRange($array_row[0], $array_row[1]) || $array_row[0] == $array_row[1]){
-                        continue 2;
-                    }
-                }
-            }
-        };
-        print("safe up \n");
+    if(validateArray($array_row)){
         $safe++;
+    } else {
+        // call method with all possible variations, if any are true, safe++
+        $new_arrays = removeEachIndex($array_row);
+        foreach($new_arrays as $array){
+            if(validateArray($array)){
+                $safe++;
+                break;
+            }
+        }
     }
     
 }
 print($safe);
 
-// 693 is too high
+function removeEachIndex($arr) {
+    $result = [];
+    foreach ($arr as $index => $value) {
+        $temp = $arr;
+        unset($temp[$index]);
+        $result[] = array_values($temp);
+    }
+    return $result;
+}
+
+function validateArray($array_row){
+    $increasing = isIncreasingOrDecreasing($array_row);
+    $in_range = true;
+
+    for($i = 0; $i < count($array_row) - 1; $i++){
+        if(($array_row[$i] == $array_row[$i + 1]) || !isIncreasingOrDecreasingWithinRange($array_row[$i], $array_row[$i + 1])){
+            return false;
+        }
+    };
+    return $increasing;
+}
 
 function isIncreasingOrDecreasingWithinRange($first, $second){
     if(abs($first - $second) >= 1 && abs($first - $second) <= 3){
