@@ -1,0 +1,5 @@
+# Ignore all files named 'input' (with or without an extension)
+input
+input.*
+**/input
+**/input.*
