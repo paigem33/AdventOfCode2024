@@ -2,6 +2,9 @@
 
 include('input.php');
 
+$input = str_replace("\r", "", $input);
+$input_array = explode("\n", trim($input));
+
 // The levels are either all increasing or all decreasing.
 // Any two adjacent levels differ by at least one and at most three
 

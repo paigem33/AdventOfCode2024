@@ -2,6 +2,16 @@
 
 include('input.php');
 
+$lines = explode("\n", $input);
+$left_array = [];
+$right_array = [];
+
+foreach ($lines as $line) {
+    list($left, $right) = preg_split('/\s+/', trim($line));
+    $left_array[] = (int) $left;
+    $right_array[] = (int) $right;
+}
+
 // example: answer would be 11
 // 3   4
 // 4   3

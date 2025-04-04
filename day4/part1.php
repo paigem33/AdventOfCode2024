@@ -2,6 +2,15 @@
 
 include('input.php');
 
+$input = str_replace("\r", "", $input);
+$exploded_array = explode("\n", trim($input));
+
+$input_array = [];
+
+foreach($exploded_array as $index => $row){
+    array_push($input_array, str_split($row));
+}
+
 $max_y = count($input_array);
 $max_x = count($input_array[0]);
 
