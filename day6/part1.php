@@ -7,39 +7,74 @@ include('input.php');
 
 $input = str_replace("\r", "", $input);
 $exploded_array = explode("\n", trim($input));
-foreach($exploded_array as $row_key => $row) // x
+foreach($exploded_array as $row_key => $row)
 {
-    $exploded_array[$row_key] = str_split($row); // y
+    $exploded_array[$row_key] = str_split($row);
 }
 
-// find the location of the guard 
-// while loop maybe
-    // move the guard forward in the grid, if it hits an object, turn right 
-    // change each position the guard visits to be an "0" if it hasn't been visited before, keep a count of all "0"s
-    // if the guard moves off the map, exit and return count of "0"s
-
-// print_r($exploded_array);
 print_r(guardLocation($exploded_array));
 
 $visited_positions = 0;
 $in_bounds = true;
 
 $guard_location = guardLocation($exploded_array);
+$guard = "^";
 while($in_bounds){
-    // todo: these could be moved into a method as well maybe, otherwise logic will be repeated
-    if($guard_location === "^"){ // move up - smaller numbers in row
-
-    } else if($guard_location === "V"){ // move down - larger numbers in row
-
-    } else if if($guard_location === "<"){ // move left - smaller numbers in column
-
-    } else if($guard_location === ">"){ // move right - larger numbers in column
-
+    if(isset($exploded_array[$guard_location[0]][$guard_location[1]])){
+        if($guard === "^"){ // move up - smaller numbers in row
+            if(shouldTurn($guard_location[0] - 1, $guard_location[1])){
+                $guard = ">";
+            } else {
+                // if the current location hasn't been visited, update and count
+                if($exploded_array[$guard_location[0]][$guard_location[1]] != "0"){
+                    $exploded_array[$guard_location[0]][$guard_location[1]] = "0";
+                    $visited_positions++;
+                }
+                $guard_location[0] = $guard_location[0] - 1;
+            }
+        } else if($guard === "V"){ // move down - larger numbers in row
+            if(shouldTurn($guard_location[0] + 1, $guard_location[1])){
+                $guard = "<";
+            } else {
+                // if the current location hasn't been visited, update and count
+                if($exploded_array[$guard_location[0]][$guard_location[1]] != "0"){
+                    $exploded_array[$guard_location[0]][$guard_location[1]] = "0";
+                    $visited_positions++;
+                }
+                $guard_location[0] = $guard_location[0] + 1;
+            }
+        } else if($guard === "<"){ // move left - smaller numbers in column
+            if(shouldTurn($guard_location[0], $guard_location[1] - 1)){
+                $guard = "^";
+            } else {
+                // if the current location hasn't been visited, update and count
+                if($exploded_array[$guard_location[0]][$guard_location[1]] != "0"){
+                    $exploded_array[$guard_location[0]][$guard_location[1]] = "0";
+                    $visited_positions++;
+                }
+                $guard_location[1] = $guard_location[1] - 1;
+            }
+        } else if($guard === ">"){ // move right - larger numbers in column
+            if(shouldTurn($guard_location[0], $guard_location[1] + 1)){
+                $guard = "V";
+            } else {
+                // if the current location hasn't been visited, update and count
+                if($exploded_array[$guard_location[0]][$guard_location[1]] != "0"){
+                    $exploded_array[$guard_location[0]][$guard_location[1]] = "0";
+                    $visited_positions++;
+                }
+                $guard_location[1] = $guard_location[1] + 1;
+            }
+        }
+    } else {
+        $in_bounds = false;
     }
 }
+print($visited_positions);
 
 function shouldTurn($next_x, $next_y){
-    if($exploded_array[$next_x, $next_y]){
+    global $exploded_array;
+    if(isset($exploded_array[$next_x][$next_y]) && $exploded_array[$next_x][$next_y] === "#"){
         return true;
     }
     return false;
@@ -49,9 +84,9 @@ function guardLocation($exploded_array)
 {
    foreach($exploded_array as $row_key => $row)
    {
-        foreach($row as $column_key => $column){ // x
-            if($column === "^" || $column === "V" || $column === "<" || $column === ">"){
-                return [$column_key, $row_key]; // (x, y)
+        foreach($row as $column_key => $column){
+            if($column === "^"){
+                return [$row_key, $column_key]; // (y, x)
             }
         }
    }
